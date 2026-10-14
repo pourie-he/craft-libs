@@ -1,4 +1,4 @@
-//! Theme mechanisms and canonical dark role colors for egui frontends.
+//! Theme mechanisms and shared interface role colors for egui frontends.
 //!
 //! This module does not install fonts, store a theme, or change global visuals. Applications
 //! adapt shared role colors to their tokens and retain borders, typography, spacing and saved
@@ -6,15 +6,17 @@
 
 use egui::{Color32, CornerRadius, Stroke, style::Widgets};
 
-/// Canonical ArtCraft colors for standard dark interface roles.
+/// Interface role colors shared by the Craft apps, one constant per scheme.
 ///
-/// The values follow the ArtCraft dark theme contract (14 October 2026). Applications map
-/// these roles into local tokens; this data does not apply a theme or select a preference.
+/// `ARTCRAFT_DARK` follows the [ArtCraft dark theme contract](https://github.com/storytold/craft-libs/blob/main/docs/artcraft-dark-theme-contract.md)
+/// (14 October 2026). Applications map these roles into local tokens; this data does not apply
+/// a theme or select a preference. An app can define its own scheme, or override single roles
+/// with `SuitePalette { accent, ..SuitePalette::ARTCRAFT_DARK }`.
 /// Alternate themes, semantic colors and document/canvas pixels remain application-owned.
 /// `on_accent` is the foreground for blue filled controls; `selection_text` is the foreground
 /// for selected interface rows. `primary`/`on_primary` support inverted primary buttons.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct SuiteDarkPalette {
+pub struct SuitePalette {
     pub window: Color32,
     pub chrome: Color32,
     pub panel: Color32,
@@ -38,9 +40,9 @@ pub struct SuiteDarkPalette {
     pub on_primary: Color32,
 }
 
-impl SuiteDarkPalette {
-    /// The canonical ArtCraft standard-dark role palette.
-    pub const ARTCRAFT: Self = Self {
+impl SuitePalette {
+    /// The ArtCraft standard-dark scheme.
+    pub const ARTCRAFT_DARK: Self = Self {
         window: Color32::from_rgb(0x12, 0x13, 0x16),
         chrome: Color32::from_rgb(0x0a, 0x0a, 0x0c),
         panel: Color32::from_rgb(0x10, 0x10, 0x14),
@@ -107,7 +109,7 @@ mod tests {
 
     #[test]
     fn artcraft_roles_match_the_dark_theme_contract() {
-        let palette = SuiteDarkPalette::ARTCRAFT;
+        let palette = SuitePalette::ARTCRAFT_DARK;
         let roles = [
             ("window", palette.window, [0x12, 0x13, 0x16, 0xff]),
             ("chrome", palette.chrome, [0x0a, 0x0a, 0x0c, 0xff]),
@@ -152,7 +154,7 @@ mod tests {
 
     #[test]
     fn artcraft_intended_foregrounds_have_readable_contrast() {
-        let palette = SuiteDarkPalette::ARTCRAFT;
+        let palette = SuitePalette::ARTCRAFT_DARK;
         for surface in [palette.window, palette.chrome, palette.panel, palette.raised, palette.input, palette.hover, palette.pressed] {
             assert!(contrast(palette.text, surface) >= 4.5);
             assert!(contrast(palette.text_strong, surface) >= 4.5);
